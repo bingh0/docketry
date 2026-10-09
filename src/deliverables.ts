@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { normalise } from './parse.js';
 
 export interface CorpusScenario { file: string; title: string; tags: string[]; line: number; outline: boolean }
 export interface FenceEntry { section: string; text: string; cites: string[]; guardedBy: string[]; line: number }
@@ -33,7 +34,7 @@ export function readCorpus(dir: string, gnt: GntApi): CorpusScenario[] {
   const out: CorpusScenario[] = [];
   const files = readdirSync(dir).filter((f) => f.endsWith('.feature')).toSorted();
   for (const file of files) {
-    const text = readFileSync(path.join(dir, file), 'utf8');
+    const text = normalise(readFileSync(path.join(dir, file), 'utf8'));
     const parsed = gnt.parseFeature(text, file);
     // an expanded row carries its outline's line; the title may hold a placeholder, so the line is the join
     const outlinesByLine = new Map<number, { title: string; tags: Set<string> }>();
@@ -93,7 +94,8 @@ export function readDesign(text: string): { cites: string[]; lines: { cites: str
 }
 
 export function readDeliverables(dir: string, gnt: GntApi | null): Deliverables {
-  const rd = (name: string): string | null => (existsSync(path.join(dir, name)) ? readFileSync(path.join(dir, name), 'utf8') : null);
+  // D184 holds for every deliverable as for the docket: byte-order mark dropped, CRLF read as LF, so a Windows checkout joins the same rows
+  const rd = (name: string): string | null => (existsSync(path.join(dir, name)) ? normalise(readFileSync(path.join(dir, name), 'utf8')) : null);
   const fence = rd('OUT-OF-SCOPE.md');
   const ledger = rd('USER-NEEDS.md');
   const design = rd('DESIGN.md');
