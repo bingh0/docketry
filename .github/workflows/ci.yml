@@ -37,5 +37,6 @@ jobs:
           set -eux
           PREFIX="$RUNNER_TEMP/prefix"
           npm install -g --prefix "$PREFIX" "$RUNNER_TEMP"/bingh-docketry-*.tgz
-          HOME="$RUNNER_TEMP/home" "$PREFIX/bin/docketry" --help
+          # no command prints usage and exits 2, could-not-run, by the docket's exit family (D177);
+          # the smoke is a real lint of the house docket, which exits 0
           HOME="$RUNNER_TEMP/home" "$PREFIX/bin/docketry" lint features/DOCKET.md
