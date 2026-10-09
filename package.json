@@ -1,0 +1,35 @@
+{
+  "name": "@bingh/docketry",
+  "version": "0.1.0",
+  "description": "A grammar for the interviewer's ruling record — the docket — and a lint that counts its failures. Counts, never verdicts.",
+  "license": "MIT",
+  "author": "Bing Ho <bingh0@users.noreply.github.com>",
+  "repository": { "type": "git", "url": "git+https://github.com/bingh0/docketry.git" },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "bin": { "docketry": "bin/docketry.js" },
+  "files": ["dist/", "bin/", "GRAMMAR.md"],
+  "engines": { "node": ">=22.17" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "lint": "oxlint src test bin",
+    "check": "npm run build && npm run lint && npm test"
+  },
+  "dependencies": { "zod": "4.5.4" },
+  "peerDependencies": { "gherkin-node-test": ">=0.11.0" },
+  "peerDependenciesMeta": { "gherkin-node-test": { "optional": true } },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "gherkin-node-test": "0.11.0",
+    "oxlint": "1.81.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.0"
+  }
+}
