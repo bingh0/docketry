@@ -22,14 +22,14 @@
     "lint": "oxlint src test bin",
     "check": "npm run build && npm run lint && npm test"
   },
-  "dependencies": { "zod": "4.5.4" },
+  "dependencies": { "zod": "4.6.7" },
   "peerDependencies": { "gherkin-node-test": ">=0.11.0" },
   "peerDependenciesMeta": { "gherkin-node-test": { "optional": true } },
   "devDependencies": {
-    "@types/node": "26.4.1",
+    "@types/node": "26.6.5",
     "gherkin-node-test": "0.11.0",
-    "oxlint": "1.81.0",
+    "oxlint": "1.90.0",
     "typescript": "7.0.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.5"
   }
 }
