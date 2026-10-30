@@ -133,7 +133,7 @@ definition lives, and the docket entry that ruled it where one did.
 | elective | a technology preference the visionary volunteers at the end of the interview; a means ruling with a prose alias `E1`, `E2` | scope SKILL.md; here D117 |
 | ratify | the visionary accepts a drafted statement as their own | scope SKILL.md; here D43 |
 | spread | a quantity or list written into a scenario outline, one row per case, so nothing enumerated hides in prose | scope SKILL.md, phase 3; here D20 |
-| cino, blind, hollow | the failure ladder: `cino` is completion in name only, green and hollow; `blind` is never written at all; each address names a lie, a tell, and a catch | [scope layers.md](https://github.com/bingh0/gherkin-node-test/blob/main/plugins/scope/skills/scope/layers.md) |
+| cino, blind, hollow | the failure ladder: `cino` is completion in name only, green and hollow; `blind` is never written at all; each address names a lie, a tell, and a catch | [gherkin-node-test docs/failure-ladder.md](https://github.com/bingh0/gherkin-node-test/blob/main/docs/failure-ladder.md) |
 | gnt | gherkin-node-test, the dialect runner; also the pattern docketry is built like | gherkin-node-test README; here D2 |
 
 ### docketry's own
