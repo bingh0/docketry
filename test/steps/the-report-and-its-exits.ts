@@ -111,6 +111,15 @@ function runCli(w: World, state: NonNullable<Scene['state']>, strict: boolean): 
   w.exit = ran.status ?? 2;
 }
 
+// ── the binary itself, with whatever arguments the scenario names (D237, D10) ──
+const runs = new WeakMap<World, { out: string; err: string }>();
+function spawnTool(w: World, args: string[]): void {
+  const ran = spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
+  runs.set(w, { out: ran.stdout, err: ran.stderr });
+  w.exit = ran.status ?? 2;
+}
+const argWords = (args: string): string[] => (args === '' ? [] : args.split(' '));
+
 // ── the grammar reference's rule words, read here so this file stands alone ──
 const cells = (row: string): string[] => row.split('|').slice(1, -1).map((s) => s.trim());
 const ticks = (s: string): string[] => [...s.matchAll(/`([^`]*)`/gu)].map((m) => m[1] ?? '');
@@ -215,6 +224,16 @@ export const reportSteps: Table = [
     runLint(w);
   }],
   [/^the docket is linted without a corpus$/u, (w) => { runLint(w); }],
+  [/^the tool is run with "([^"]*)"$/u, (w, args) => { spawnTool(w, argWords(args)); }],
+  [/^the tool is run on the docket with "([^"]*)"$/u, (w, args) => {
+    const b = builder(w);
+    b.ensureAny();
+    const { dir } = prepare(w, 'none');
+    spawnTool(w, ['lint', join(dir, 'DOCKET.md'), ...argWords(args)]);
+  }],
+  [/^the standard output contains "([^"]*)"$/u, (w, text) => { assert.ok((runs.get(w)?.out ?? '').includes(text), `stdout: ${runs.get(w)?.out ?? '(none)'}`); }],
+  [/^the standard error contains "([^"]*)"$/u, (w, text) => { assert.ok((runs.get(w)?.err ?? '').includes(text), `stderr: ${runs.get(w)?.err ?? '(none)'}`); }],
+  [/^the standard output is the lint version alone$/u, (w) => { assert.equal((runs.get(w)?.out ?? '').trim(), LINT_VERSION); }],
   [/^the docket is linted with the corpus$/u, (w) => {
     const kind = scene(w).corpus;
     runLint(w, {}, kind === 'none' ? 'bare' : kind);

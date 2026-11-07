@@ -45,9 +45,10 @@ discussion; every change appends a changelog line naming its ruling.
   reports dark, never zero. The content layer is judgment and stays
   outside. [ruled: D6, D22]
 - Two modes, one bit: default reports everything and exits zero; strict
-  exits one on any finding; nothing is ever hidden or demoted in either
+  exits one on any finding; `--help` and `--version` answer on stdout
+  and exit zero; nothing is ever hidden or demoted in either
   mode. Exit family: 0 ran, 1 strict findings, 2 could not run.
-  [ruled: D10, D11, D26]
+  [ruled: D10, D11, D26, D237]
 - Read-only and stateless: the lint never writes an input and keeps
   nothing between runs, so any cadence works. The formatter is the one
   deliberate writer, only when invoked. Render emits to a new path or
@@ -73,7 +74,13 @@ discussion; every change appends a changelog line naming its ruling.
   this document's `ruled` tags. A resolved entry is never counted as
   triggered; only fence kinds may carry a trigger, and there it is the
   reopening or failure condition. The renderer writes those citations;
-  traceability checks them. [ruled: D23, D24, D68]
+  traceability checks them. A Declined entry's guardian joins through the
+  ruling that enforces the decline, cited beside the fence ruling, never
+  through the fence id, which no scenario may carry; a guardian title
+  the corpus lacks is a finding, never silence; the guard phrase has
+  one form, and a guard claim in the listed other spellings is a
+  finding too, while prose that merely says guarded by is no claim.
+  [ruled: D23, D24, D68, D234, D235, D236]
 - The resolution set is seven kinds: boundary, structural, means, need,
   fence-declined, fence-deferred, fence-assumption. Need, means, and the
   fence kinds carry a reference; boundary and structural carry none, and
@@ -101,7 +108,7 @@ discussion; every change appends a changelog line naming its ruling.
   means ruling, never a need, a boundary, or a fence kind. Boundary
   rulings, like structural ones, name the need they serve. A digit run
   joined to a letter prefix by nothing, a hyphen, or a dot is a token.
-  [ruled: D146, D147, D148, D149, D162, D163]
+  [ruled: D146, D147, D148, D149, D162, D163, D240]
 - A relation entry compares against the highest tag on its target's
   chain, ratified amenders counting as visionary; visionary-tagged
   relation entries are listed by id. Reversals of triggered entries join
@@ -112,7 +119,7 @@ discussion; every change appends a changelog line naming its ruling.
   trailing entry is incomplete only when it lacks response, touches, or
   trigger-or-resolution-or-relation, and only the missing-line findings
   are held. The precondition fix says "add the trigger". Every report
-  lists its ratifications by id, target, and date. [ruled: D151, D152,
+  lists its ratifications by id, target, and date. [ruled: D151, D238, D152,
   D153, D154]
 - The parse derives a SHA-256 hash per entry and a chain hash over the
   docket, never written into it; built-in crypto. [ruled: D155]

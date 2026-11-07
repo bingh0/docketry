@@ -138,6 +138,82 @@ Feature: where each ruling landed
     Then the traceability layer has 1 finding keyed R13
     And the finding's message contains "carries no tag @R13"
 
+  @D238
+  Scenario: an outline title the corpus holds twice is satisfied by the later file carrying the tag
+    Given a docket whose entry R13 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R12
+    And a second feature file where the outline "duplicate-timing" carries the tag @R13
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D238
+  Scenario: an outline title the corpus holds twice is satisfied by the earlier file carrying the tag
+    Given a docket whose entry R13 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R13
+    And a second feature file where the outline "duplicate-timing" carries the tag @R12
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D238
+  Scenario: an outline carrying the amender's tag satisfies the spread of the entry it amends
+    Given a docket whose entry R13 has a trigger and whose entry R15 amends R13 keeping the trigger
+    And a docket whose entry R15 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R15
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D240
+  Scenario: a scenario citing a root whose amender dropped the resolution line is the unresolved finding, not a mis-kinded tag
+    Given a docket whose entry R13 resolves to structural
+    And a docket whose entry R14 amends R13
+    And R14 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R13
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+    And the resolution layer has 1 finding keyed R13
+
+  @D240
+  Scenario: the amender's tag reads as the root's does when the amender dropped the resolution line
+    Given a docket whose entry R13 resolves to structural
+    And a docket whose entry R14 amends R13
+    And R14 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R14
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+    And the resolution layer has 1 finding keyed R13
+
+  @D240
+  Scenario: a scenario citing a relation entry with no trigger or resolution of its own is a mis-kinded citation
+    Given a docket whose entry R15 reverses R13
+    And R15 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R15
+    When the docket is linted with the corpus
+    Then the traceability layer has 1 finding at the scenario "a duplicate is kept"
+    And the finding's message contains "no trigger or resolution of its own"
+
+  @D240
+  Scenario: a scenario citing the amender of a bare relation entry is a mis-kinded citation too
+    Given a docket whose entry R15 reverses R13
+    And R15 carries no trigger of its own
+    And a docket whose entry R16 amends R15
+    And R16 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R16
+    When the docket is linted with the corpus
+    Then the traceability layer has 1 finding at the scenario "a duplicate is kept"
+    And the finding's message contains "whose root R15 is a reverses entry"
+
+  @D240
+  Scenario: a root whose amender dropped the resolution line enforces no decline
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 resolves to structural
+    And a docket whose entry R3 amends R2
+    And R3 carries no trigger of its own
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding's message contains "no triggered, structural, or means ruling"
+
   @D24
   Scenario: a spread naming an outline the corpus lacks is a traceability finding
     Given a docket whose entry R13 has the line "spread: duplicate-timing"
@@ -146,14 +222,529 @@ Feature: where each ruling landed
     Then the traceability layer has 1 finding keyed R13
     And the finding's message contains "duplicate-timing"
 
-  @D24
-  Scenario: a guarded-by scenario lacking the guarding tag is a traceability finding
+  @D234
+  Scenario: a guardian carrying no tag of the entry's enforcing ruling is a traceability finding
     Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding keyed R14
+    And the finding's message names "a diff handed back as evidence is refused" and R2
+    And the finding's fix shows "@R2 on"
+    And no finding's fix shows "@R14"
+
+  @D234
+  Scenario: a guarded entry citing only its fence ruling is a traceability finding whose fix names the citation to add, never the fence id as a tag
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
     And a fence entry citing R14 with Guarded by: "a diff handed back as evidence is refused"
-    And a corpus where "a diff handed back as evidence is refused" carries no tag @R14
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding keyed R14
+    And the finding's message names "a diff handed back as evidence is refused"
+    And the finding's fix shows "cite beside R14"
+    And no finding's fix shows "@R14"
+
+  @D234
+  Scenario: a guarded entry citing its fence ruling and the enforcing ruling its guardian carries is a clean strict run
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables under strict
+    Then the traceability layer has 0 findings
+    And the exit code is 0
+
+  @D234
+  Scenario: a guardian tagged with the fence id is the mis-kinded finding, not a satisfied guard
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tags @R14 and @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding at the scenario "a diff handed back as evidence is refused"
+    And the finding's message contains "a fence-declined entry"
+
+  @D234
+  Scenario: a guardian carrying the tag of the enforcing ruling's amender satisfies the guard
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R3 amends R2 and R2 has a trigger
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D234
+  Scenario: an entry naming two guardians, one untagged, is one finding naming that guardian
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused", "a diff pasted as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding's message names "a diff pasted as evidence is refused" and R2
+
+  @D234
+  Scenario: an entry citing several enforcing rulings is satisfied by a guardian carrying any of them
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R4 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R4 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R4
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D234
+  Scenario: a reversed citation beside its bare reverser enforces nothing, so the fix names neither
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R15 reverses R13
+    And R15 carries no trigger of its own
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R13 and R15 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
     When the docket is linted with the deliverables
     Then the traceability layer has 1 finding keyed R14
+    And the finding's fix shows "cite beside R14"
+    And no finding's fix shows "@R13"
+    And no finding's fix shows "@R15"
+
+  @D234
+  Scenario: a bare ratifier cited beside the decline enforces nothing, so the fix never names it as a tag
+    Given a docket whose entry R14 resolves to fence-declined and whose entry R16 ratifies R14
+    And R16 carries no trigger of its own
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R16 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding's message contains "no triggered, structural, or means ruling"
+    And no finding's fix shows "@R16"
+
+  @D235
+  Scenario: a guardian title the corpus lacks is a traceability finding naming the scenario to write
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding keyed R14
+    And the finding is reported under the rule word "guard-no-scenario"
     And the finding's message names "a diff handed back as evidence is refused"
+    And the finding's fix shows "a scenario titled"
+    And the finding's fix shows "tagged @R2"
+
+  @D235
+  Scenario: the guard finding is keyed by the fence ruling whatever the citation order, at the entry's line
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R2 and R14 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding sits at that fence entry's line
+
+  @D235
+  Scenario: a guardian title differing by a trailing space is a title the corpus lacks
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused "
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding's message contains "no scenario of that title"
+
+  @D235
+  Scenario: a guardian title the corpus lacks, on an entry citing only its decline, names both things to add
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding keyed R14
+    And the finding's fix shows "cited beside R14"
+    And no finding's fix shows "@R14"
+
+  @D235
+  Scenario: the guardian join is by exact title
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "A diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding's message contains "no scenario of that title"
+
+  @D235
+  Scenario: an entry naming two guardians, one the corpus lacks, is one finding naming the missing one
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused", "a diff pasted as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding's message names "a diff pasted as evidence is refused"
+    And the finding's message contains "no scenario of that title"
+
+  @D235
+  Scenario: a corpus holding the fence but no feature file yet leaves a guardian dark
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a lowercase guard phrase is a finding, never a silent non-guard
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose guard phrase is lowercase for "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding at that fence entry
+    And the finding is reported under the rule word "guard-near-miss"
+    And the finding's fix shows "Guarded by:"
+
+  @D236
+  Scenario: a guardian in curly quotes is a finding, never a silent non-guard
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose guardian "a diff handed back as evidence is refused" is in curly quotes
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the traceability layer has 1 finding at that fence entry
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: an and between two guardians no longer drops the second in silence
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused" and "a diff pasted as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the phrase without its colon, followed by a quoted title, is a claim the one form does not read
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a title in single quotes is a claim the one form does not read
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: 'a diff handed back as evidence is refused'
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a second title in single quotes after a straight-quoted first is read by the claim and not by the form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", 'a diff pasted as evidence is refused'
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a second title in curly quotes after a straight-quoted first is read by the claim and not by the form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", “a diff pasted as evidence is refused”
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a second title in backticks after a straight-quoted first is read by the claim and not by the form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", `a diff pasted as evidence is refused`
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a comma and an and between two titles is a run the claim reads and the form does not
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", and "a diff pasted as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a space before the colon is a spelling the one form does not read
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by : "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a no-break space inside the phrase is a spelling the one form does not read
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a second claim later in the entry is read at its own position
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused" and the lock is guarded by "the bolt"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the words guarded by inside a named title are no second claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R3 whose entry text reads Guarded by: "what the door is guarded by", "a diff handed back as evidence is refused"
+    And a corpus where the scenario "what the door is guarded by" carries the tag @R3
+    And a second feature file where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: an apostrophe in prose after a guard in the one form is no title
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", 'til the owner's return
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a second title in single quotes before a period is read by the claim, its closing quote ending no word
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", 'a diff pasted as evidence is refused'.
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a second title in single curly quotes after a straight-quoted first is read by the claim and not by the form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", ‘a diff pasted as evidence is refused’
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a space before the comma between two titles is not the one form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused" , "a diff pasted as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the phrase without its colon, followed by a title in double-curly quotes, is a claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by “a diff handed back as evidence is refused”
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: two spaces inside the phrase are a spelling the one form does not read
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded  by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the words guarded by inside the second of two named titles are no second claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R3 whose entry text reads Guarded by: "a diff handed back as evidence is refused", "what the door is guarded by"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a second feature file where the scenario "what the door is guarded by" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: the bare phrase in prose followed by an apostrophe word opens no claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads The door is guarded by 'til dawn by the bolt. Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a claim in another case before a later claim in the one form is read at its own position
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R3 whose entry text reads guarded by: "a diff handed back as evidence is refused" and later Guarded by: "what the door is guarded by"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a second feature file where the scenario "what the door is guarded by" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the phrase without its colon, followed by a title in single curly quotes, is a claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by ‘a diff handed back as evidence is refused’
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: two titles with only a space between are the one form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R3 whose entry text reads Guarded by: "a diff handed back as evidence is refused" "what the door is guarded by"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a second feature file where the scenario "what the door is guarded by" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: two titles with a comma and no space between are the one form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 and R3 whose entry text reads Guarded by: "a diff handed back as evidence is refused","what the door is guarded by"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a second feature file where the scenario "what the door is guarded by" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a closing single quote followed by a digit is an apostrophe
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", 'room'101 holds the rest
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a closing single curly quote followed by a digit is an apostrophe
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused", ‘room’01 holds the rest
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: an empty straight-quoted title is not the one form
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "", "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: the phrase with its colon and no quoted title is a claim with nothing in it
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: the scenario above
+    And a corpus where the scenario "a diff pasted as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a guard in the one form followed by prose that quotes a word is no near-miss
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads Guarded by: "a diff handed back as evidence is refused" where the reply reads "refused" (and the door "shut")
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: prose that says guarded by and quotes something later is no claim
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose entry text reads The door is guarded by the bolt, whose state reads "shut".
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a corpus holding the fence but no feature file yet still reports a near-miss
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 whose guard phrase is lowercase for "a diff handed back as evidence is refused"
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding
+    And the finding is reported under the rule word "guard-near-miss"
+
+  @D236
+  Scenario: a title the corpus holds twice is satisfied by the later file carrying the tag
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R3
+    And a second feature file where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
+
+  @D236
+  Scenario: a title the corpus holds twice is satisfied by the earlier file carrying the tag
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 is a triggered ruling in effect
+    And a docket whose entry R3 is a triggered ruling in effect
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    And a second feature file where the scenario "a diff handed back as evidence is refused" carries the tag @R3
+    When the docket is linted with the deliverables
+    Then the traceability layer has 0 findings
 
   @D24
   Scenario: entries that need no scenario are listed as not counted with the reason

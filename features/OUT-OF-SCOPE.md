@@ -15,14 +15,14 @@ is also a resolution in `DOCKET.md`, cited by docket id.
 - **Open vocabularies and a normalizing pass.** Prose lives only inside
   slots; every other field is a closed set, and a normalizer would be a
   second grammar nobody specified. Guarded by: "a provenance tag outside
-  the four refuses the docket naming the line", "a resolution kind outside
-  the fixed set refuses the docket" (D93, D15, 2026-09-04)
+  the five refuses the docket naming the line", "a resolution kind outside
+  the fixed set refuses the docket" (D93, D15, D78, 2026-09-04)
 - **Dates updated in place, and undated entries.** The docket is
   append-only with typed relations; in-place rewrites lose history under
   rule 7's touches, and an undated entry cannot be walked. Guarded by:
   "an undated entry is a form finding" (D94, D16, 2026-09-04)
 - **Gherkin keywords as slot keywords.** A docket must never be
-  mistakable for a feature file. Guarded by: "a Gherkin keyword used as
+  mistakable for a feature file. Guarded by: "each Gherkin keyword used as
   a slot keyword refuses the docket" (D95, D18, 2026-09-04)
 - **A regex heuristic for quantities.** Ruled in, then reversed the same
   day: quantities are syntax, a node kind; a bare digit run is a lexical
@@ -94,6 +94,13 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   2026-10-17 are the first field data. Until then a citing surface is
   re-read by hand after each amendment, as the touches line directs.
   (D233, 2026-10-05)
+- **guard-spellings.** Guard phrases outside the enumeration D236 reads:
+  a fullwidth or other Unicode colon, guillemets with no colon, `or`,
+  `&`, or `+` between titles, an invisible character between titles, a
+  claim inside the parenthetical, a guard under a section other than
+  Declined, a title with doubled spaces. Reopens when a scoped corpus's
+  fence carries one and nothing reports it; the list is in
+  `docs/guard-untagged-vs-mis-kinded-2026-11-07.md`. (D239, 2026-11-07)
 - **ratifying-the-never-inferred.** A `ratifies` entry whose target was
   never tagged inferred is a consistency case not yet ruled; held at
   handoff. (D56 ratified by D62, 2026-09-05)
@@ -128,6 +135,10 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   and judgment's lane; a braced list is spread like a quantity. (D24,
   D121)
 
+- A fence written as a Markdown table is not read; the fence's grammar is
+  the bullet list the scope skill writes, one entry per `- ` line with
+  its parenthetical last. (D88)
+
 - Editor integration — highlighting, a language server, in-editor
   squiggles — is nobody's lane here; a finding names its line and its
   one correct form, and any editor's problems pane can show that from
@@ -154,6 +165,25 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   scenario. (D23, 2026-09-04)
 - Scenarios only; scenarios and the design doc — all four deliverables
   by kind. (D24, 2026-09-04)
+- A guardian exempted from the mis-kinded finding; the fix hint corrected
+  with the contract left to house practice — the guard is the enforcing
+  ruling, cited beside the decline. (D234, 2026-11-07)
+- A counted line for a guardian the corpus lacks; a near-miss match on
+  the title — a finding, by exact title as a spread's outline is. (D235,
+  2026-11-07)
+- Reading every spelling of the guard phrase gherkin-trace reads as the
+  form; the last-read scenario deciding a duplicated title; a duplicated
+  title as its own finding — one form, a guard claim in the listed other
+  spellings a finding; either scenario satisfies. (D236, 2026-11-07)
+- `--help` as could-not-run; the usage on stdout in the error case — a
+  question answered is a run that ran, exit zero; the error case keeps
+  stderr and two. (D237, 2026-11-07)
+- The last-read outline deciding a duplicated outline title — any
+  outline of that title carrying the tag satisfies the spread. (D238,
+  2026-11-07)
+- Every unresolved root mis-kinded at its tag too; the relation test on
+  the cited entry — one defect reported once, at the amender, and the
+  relation read on the chain's root. (D240, 2026-11-07)
 - Zero entries as clean; empty as a form finding — could-not-run.
   (D26, 2026-09-04)
 - Roll-up past a threshold; a size warning — size is not a behaviour.

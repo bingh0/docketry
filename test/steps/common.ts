@@ -266,6 +266,12 @@ export const thenSteps: Table = [
   [/^the finding's fix says "([^"]*)"$/u, (w, text) => {
     assert.ok(found(w).some((f) => (f.fix ?? '').includes(text)), `no fix says "${text}": ${found(w).map((f) => f.fix).join(' | ')}`);
   }],
+  [/^the finding is reported under the rule word "([a-z-]+)"$/u, (w, word) => {
+    assert.ok(found(w).some((f) => f.rule === word), `no finding under ${word}: ${found(w).map((f) => f.rule).join(' | ')}`);
+  }],
+  [/^no finding's fix shows "([^"]*)"$/u, (w, text) => {
+    assert.ok(found(w).every((f) => !(f.fix ?? '').includes(text)), `a fix shows "${text}": ${found(w).map((f) => f.fix).join(' | ')}`);
+  }],
   [/^the finding's fix reads "([^"]*)"$/u, (w, text) => {
     assert.ok(found(w).some((f) => f.fix === text), `no fix reads "${text}": ${found(w).map((f) => f.fix).join(' | ')}`);
   }],

@@ -23,13 +23,15 @@ interface Scene {
   /** the file line of the fence entry and of the ruled tag last written */
   fenceLine: number;
   designLine: number;
+  /** rows of a second feature file, for a title the corpus holds twice (D236) */
+  second: Row[];
 }
 
 const scenes = new WeakMap<World, Scene>();
 const scene = (w: World): Scene => {
   const seen = scenes.get(w);
   if (seen) return seen;
-  const made: Scene = { uncited: new Set(), fence: null, ledger: null, fenceLine: 0, designLine: 0 };
+  const made: Scene = { uncited: new Set(), fence: null, ledger: null, fenceLine: 0, designLine: 0, second: [] };
   scenes.set(w, made);
   return made;
 };
@@ -121,6 +123,15 @@ function setFence(w: World, section: string, entry: string): void {
 
 /** the section a fence entry recording this ruling belongs under */
 const sectionOf = (b: DocketBuilder, id: string): string => FENCE_SECTION[kindOf(b, id) ?? ''] ?? 'Roads not taken';
+/** the section for an entry citing several rulings: that of the first fence-kind citation, wherever it sits in the list */
+const sectionFor = (b: DocketBuilder, cites: readonly string[]): string => {
+  const kinded = cites.find((c) => FENCE_SECTION[kindOf(b, c) ?? ''] !== undefined);
+  return sectionOf(b, kinded ?? cites[0] ?? '');
+};
+const guarded = (w: World, ids: string, guard: string): void => {
+  const cites = ids.split(' and ');
+  setFence(w, sectionFor(builder(w), cites), `**The road this ruling closed.** The prose of the entry. ${guard} ${cited(cites)}`);
+};
 
 const cited = (ids: readonly string[]): string => `(${[...ids, '2026-09-05'].join(', ')})`;
 
@@ -165,8 +176,10 @@ function runLint(w: World, mode: Mode): void {
   mkdirSync(dir, { recursive: true });
   w.defer(() => { rmSync(dir, { recursive: true, force: true }); });
   writeFileSync(join(dir, 'DOCKET.md'), text, 'utf8');
-  if (mode === 'corpus' || (mode === 'deliverables' && b.corpusFeature.length > 0)) {
+  const second = scene(w).second;
+  if (mode === 'corpus' || (mode === 'deliverables' && (b.corpusFeature.length > 0 || second.length > 0))) {
     writeFileSync(join(dir, 'archive.feature'), featureText(corpusRows(w, b, text)), 'utf8');
+    if (second.length > 0) writeFileSync(join(dir, 'second.feature'), featureText(second), 'utf8');
   }
   if (b.fenceText !== '') writeFileSync(join(dir, 'OUT-OF-SCOPE.md'), b.fenceText, 'utf8');
   if (b.ledgerText !== '') writeFileSync(join(dir, 'USER-NEEDS.md'), b.ledgerText, 'utf8');
@@ -200,6 +213,12 @@ export const landedSteps: Table = [
     const b = builder(w);
     b.slot(id, 'trig');
     b.later(amender, 'amends', id, null, null);
+  }],
+  // a bare relation entry: the relation is its resolution, and it states no behaviour of its own (D234)
+  [/^([A-Z]\d+) carries no trigger of its own$/u, (w, id) => {
+    const b = builder(w);
+    b.removeSlot(id, 'pre');
+    b.removeSlot(id, 'trig');
   }],
   [/^a docket whose entry ([A-Z]\d+) resolves to (\S+) and whose entry ([A-Z]\d+) ratifies \1$/u, (w, id, kind, ratifier) => {
     const b = builder(w);
@@ -243,6 +262,15 @@ export const landedSteps: Table = [
     b.corpusFeature.push({ title, tags: [tag], outline: false });
     scene(w).uncited.add(absent);
   }],
+  [/^a second feature file where the scenario "([^"]*)" carries the tag @([A-Z]\d+)$/u, (w, title, tag) => {
+    builder(w).corpus = true;
+    scene(w).second.push({ title, tags: [tag], outline: false });
+  }],
+  [/^a corpus where the scenario "([^"]*)" carries the tags @([A-Z]\d+) and @([A-Z]\d+)$/u, (w, title, a, b) => {
+    const bb = builder(w);
+    bb.corpus = true;
+    bb.corpusFeature.push({ title, tags: [a, b], outline: false });
+  }],
   [/^a corpus where the scenario "([^"]*)" carries no tag$/u, (w, title) => {
     const b = builder(w);
     b.corpus = true;
@@ -250,12 +278,6 @@ export const landedSteps: Table = [
   }],
   [/^a corpus where no scenario carries the tag @([A-Z]\d+)$/u, (w, tag) => {
     builder(w).corpus = true;
-    scene(w).uncited.add(tag);
-  }],
-  [/^a corpus where "([^"]*)" carries no tag @([A-Z]\d+)$/u, (w, title, tag) => {
-    const b = builder(w);
-    b.corpus = true;
-    b.corpusFeature.push({ title, tags: ['smoke'], outline: false });
     scene(w).uncited.add(tag);
   }],
   // the outline is the only thing said to lack the tag; a scenario elsewhere
@@ -266,6 +288,18 @@ export const landedSteps: Table = [
     b.ensure(tag);
     b.corpusFeature.push({ title, tags: [tag], outline: true });
     assert.notEqual(tag, absent);
+  }],
+  [/^a corpus whose outline "([^"]*)" carries the tag @([A-Z]\d+)$/u, (w, title, tag) => {
+    const b = builder(w);
+    b.corpus = true;
+    b.ensure(tag);
+    b.corpusFeature.push({ title, tags: [tag], outline: true });
+  }],
+  [/^a second feature file where the outline "([^"]*)" carries the tag @([A-Z]\d+)$/u, (w, title, tag) => {
+    const b = builder(w);
+    b.corpus = true;
+    b.ensure(tag);
+    scene(w).second.push({ title, tags: [tag], outline: true });
   }],
   [/^a corpus with no scenario outline titled "(?:[^"]*)"$/u, (w) => { builder(w).corpus = true; }],
   [/^a corpus directory$/u, (w) => { builder(w).corpus = true; }],
@@ -282,9 +316,13 @@ export const landedSteps: Table = [
     const cites = [...ids.matchAll(/[A-Z]\d+/gu)].map((m) => m[0]);
     setFence(w, section.replaceAll('-', ' '), `**The road this entry records.** The prose of the entry. ${cited(cites)}`);
   }],
-  [/^a fence entry citing ([A-Z]\d+) with Guarded by: "([^"]*)"$/u, (w, id, title) => {
-    setFence(w, sectionOf(builder(w), id), `**The road this ruling closed.** The prose of the entry. Guarded by: "${title}" ${cited([id])}`);
-  }],
+  // the first id is the entry's own fence ruling; the rest are the rulings that enforce it (D234)
+  [/^a fence entry citing ([A-Z]\d+(?: and [A-Z]\d+)*) with Guarded by: ("[^"]*"(?:, "[^"]*")*)$/u, (w, ids, titles) => { guarded(w, ids, `Guarded by: ${titles}`); }],
+  // the spellings the one form does not read (D236)
+  [/^a fence entry citing ([A-Z]\d+(?: and [A-Z]\d+)*) with Guarded by: "([^"]*)" and "([^"]*)"$/u, (w, ids, a, b) => { guarded(w, ids, `Guarded by: "${a}" and "${b}"`); }],
+  [/^a fence entry citing ([A-Z]\d+(?: and [A-Z]\d+)*) whose entry text reads (.+)$/u, (w, ids, raw) => { guarded(w, ids, raw); }],
+  [/^a fence entry citing ([A-Z]\d+(?: and [A-Z]\d+)*) whose guard phrase is lowercase for "([^"]*)"$/u, (w, ids, title) => { guarded(w, ids, `guarded by: "${title}"`); }],
+  [/^a fence entry citing ([A-Z]\d+(?: and [A-Z]\d+)*) whose guardian "([^"]*)" is in curly quotes$/u, (w, ids, title) => { guarded(w, ids, `Guarded by: \u201C${title}\u201D`); }],
 
   // ── the ledger ────────────────────────────────────────────────────────────
   [/^a ledger that names ([A-Z]\d+) through ([A-Z]\d+) and not ([A-Z]\d+)$/u, (w, first, last, absent) => {
@@ -325,12 +363,17 @@ export const landedSteps: Table = [
   // ── running ───────────────────────────────────────────────────────────────
   [/^the docket is linted with the corpus$/u, (w) => { runLint(w, 'corpus'); }],
   [/^the docket is linted with the deliverables$/u, (w) => { runLint(w, 'deliverables'); }],
+  [/^the docket is linted with the deliverables under strict$/u, (w) => { builder(w).strict = true; runLint(w, 'deliverables'); }],
   [/^the docket is linted without a corpus$/u, (w) => { runLint(w, 'none'); }],
 
   // ── findings located in a deliverable ─────────────────────────────────────
   [/^the traceability layer has (\d+) findings? at the scenario "([^"]*)"$/u, (w, n, title) => {
     const hits = keep(w, trace(w).filter((f) => (f.where ?? '').includes(`"${title}"`)));
     assert.equal(hits.length, Number(n), show(trace(w)));
+  }],
+  [/^the finding sits at that fence entry's line$/u, (w) => {
+    const list = w.found ?? trace(w);
+    assert.ok(list.some((f) => f.line === scene(w).fenceLine), `no finding at line ${scene(w).fenceLine}: ${show(list)}`);
   }],
   [/^the traceability layer has (\d+) findings? at that fence entry$/u, (w, n) => {
     const s = scene(w);

@@ -4,7 +4,7 @@ The craft of dockets. A closed grammar for the ruling record of a
 structured interview — the docket — with a first-party tree, a lint, a
 formatter, and a renderer over it.
 
-**Status: beta, 0.1.0.** A proof-of-concept release for field use,
+**Status: beta, 0.2.0.** A proof-of-concept release for field use,
 published so a scoping interview can be linted by anyone who runs one.
 Grammar version 1 and findings format 1 are what the beta parses and
 emits; before 1.0 a later release may bump either major between package
@@ -87,7 +87,7 @@ Run the lint every chat cycle, not only at handoff. It costs a second
 and reads in one screen, which is the point: a continuous-integration
 test of the record, run as often as the record changes (N9, D218).
 
-Exit family: 0 ran, 1 strict findings, 2 could not run. Six layers — form,
+Exit family: 0 ran, 1 strict findings, 2 could not run; `--help` and `--version` are runs that ran. Six layers — form,
 provenance, resolution, coverage, consistency, traceability — the last
 dark without a corpus and needing gherkin-node-test installed where the
 lint runs. In-process: `parseDocket`, `lintDocket`, `formatDocket`,
@@ -126,14 +126,14 @@ definition lives, and the docket entry that ruled it where one did.
 | scope | the bounded statement of what the system must do, for whom, and what it must not; the artifact the human ratifies | scope SKILL.md; the paper's section 3 |
 | contract | the feature files plus their companions, as handed to the build; the thing reviewed before code exists | scope SKILL.md, output contract |
 | feature file, scenario | Gherkin, in the gherkin-node-test dialect; the agent's working representation of a behaviour | [gherkin-node-test README](https://github.com/bingh0/gherkin-node-test#supported-grammar) |
-| fence | `OUT-OF-SCOPE.md`: declined, deferred, and assumed items, each citing its ruling | scope SKILL.md, the fence |
+| fence | `OUT-OF-SCOPE.md`: declined, deferred, and assumed items, each citing its ruling; a declined item may name the scenarios that guard it, joined through the enforcing ruling cited beside the decline | scope SKILL.md, the fence; GRAMMAR.md, guardians; D234–D236 |
 | needs ledger | `USER-NEEDS.md`: one row per need with beneficiary, weight, evidence, chosen means, and coverage | [scope needs.md](https://github.com/bingh0/gherkin-node-test/blob/main/plugins/scope/skills/scope/needs.md) |
 | means versus need | the swap test: a statement that survives its mechanism being swapped is a need; one that dies with it is a means, recorded under the need it serves | scope needs.md |
 | design document, `ruled` tag | `DESIGN.md`: the build agent's orienting constraints, each tagged `ruled` with the id that fixed it or `chosen` by the agent | scope SKILL.md, phase 5½ |
 | elective | a technology preference the visionary volunteers at the end of the interview; a means ruling with a prose alias `E1`, `E2` | scope SKILL.md; here D117 |
 | ratify | the visionary accepts a drafted statement as their own | scope SKILL.md; here D43 |
 | spread | a quantity or list written into a scenario outline, one row per case, so nothing enumerated hides in prose | scope SKILL.md, phase 3; here D20 |
-| cino, blind, hollow | the failure ladder: `cino` is completion in name only, green and hollow; `blind` is never written at all; each address names a lie, a tell, and a catch | [scope layers.md](https://github.com/bingh0/gherkin-node-test/blob/main/plugins/scope/skills/scope/layers.md) |
+| cino, blind, hollow | the failure ladder: `cino` is completion in name only, green and hollow; `blind` is never written at all; each address names a lie, a tell, and a catch | [gherkin-node-test docs/failure-ladder.md](https://github.com/bingh0/gherkin-node-test/blob/main/docs/failure-ladder.md) |
 | gnt | gherkin-node-test, the dialect runner; also the pattern docketry is built like | gherkin-node-test README; here D2 |
 
 ### docketry's own
