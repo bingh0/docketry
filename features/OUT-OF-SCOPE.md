@@ -15,14 +15,14 @@ is also a resolution in `DOCKET.md`, cited by docket id.
 - **Open vocabularies and a normalizing pass.** Prose lives only inside
   slots; every other field is a closed set, and a normalizer would be a
   second grammar nobody specified. Guarded by: "a provenance tag outside
-  the four refuses the docket naming the line", "a resolution kind outside
-  the fixed set refuses the docket" (D93, D15, 2026-09-04)
+  the five refuses the docket naming the line", "a resolution kind outside
+  the fixed set refuses the docket" (D93, D15, D78, 2026-09-04)
 - **Dates updated in place, and undated entries.** The docket is
   append-only with typed relations; in-place rewrites lose history under
   rule 7's touches, and an undated entry cannot be walked. Guarded by:
   "an undated entry is a form finding" (D94, D16, 2026-09-04)
 - **Gherkin keywords as slot keywords.** A docket must never be
-  mistakable for a feature file. Guarded by: "a Gherkin keyword used as
+  mistakable for a feature file. Guarded by: "each Gherkin keyword used as
   a slot keyword refuses the docket" (D95, D18, 2026-09-04)
 - **A regex heuristic for quantities.** Ruled in, then reversed the same
   day: quantities are syntax, a node kind; a bare digit run is a lexical
@@ -154,6 +154,16 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   scenario. (D23, 2026-09-04)
 - Scenarios only; scenarios and the design doc — all four deliverables
   by kind. (D24, 2026-09-04)
+- A guardian exempted from the mis-kinded finding; the fix hint corrected
+  with the contract left to house practice — the guard is the enforcing
+  ruling, cited beside the decline. (D234, 2026-11-07)
+- A counted line for a guardian the corpus lacks; a near-miss match on
+  the title — a finding, by exact title as a spread's outline is. (D235,
+  2026-11-07)
+- Reading every spelling of the guard phrase gherkin-trace reads as the
+  form; the last-read scenario deciding a duplicated title; a duplicated
+  title as its own finding — one form, a guard claim in the listed other
+  spellings a finding; either scenario satisfies. (D236, 2026-11-07)
 - Zero entries as clean; empty as a form finding — could-not-run.
   (D26, 2026-09-04)
 - Roll-up past a threshold; a size warning — size is not a behaviour.

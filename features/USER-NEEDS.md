@@ -73,7 +73,7 @@ the visionary's ratification.
   on every change, every cycle, every question, and not only at
   handoff.* Context: an instrument that is expensive to run or
   to rule on is not run; observability that nobody reads is none.
-  Evidence: D12, D51, D47, D22, D218. Coverage: `scenario` —
+  Evidence: D12, D51, D47, D22, D218, D234, D235, D236. Coverage: `scenario` —
   the-report-and-its-exits.feature, the-docket-grammar.feature,
   where-each-ruling-landed.feature. Statement as amended by N9.
 - **N3** (visionary, wt 3) — *I need every gap the record shows

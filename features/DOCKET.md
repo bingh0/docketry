@@ -1484,3 +1484,32 @@ D233 2026-10-05 [I>V]
   serves: N12
   touches: D172 D155 D223 D110
 # roads not taken: pins shipped in 0.1.0 against a seven-day clock, refused as a change to every citing surface in the scope skill and the house corpus that a junior team's 24h build would then see go stale on every amendment
+
+# 2026-11-07 — a field report from a scoped corpus (switchyard, docs/guard-untagged-vs-mis-kinded-2026-11-07.md): the guard-untagged fix named the fence id as the tag to add, D163 made that tag a mis-kinded citation two days after D24 was ruled, and the two were never reconciled; the house fence had cited the enforcing ruling beside the decline since its first day, so the contract was practice and never grammar
+
+D234 2026-11-07 [I>V] amends D68
+  pre:   the lint is given the docket and the deliverables [I>V]
+  trig:  the traceability layer runs [I>V]
+  resp:  every entry must land where its effective shape implies — triggered entries in scenarios by tag, needs in the ledger, fence kinds in the fence, structural and means in the design doc's ruled tags; an entry carrying a resolution is not counted as triggered by coverage or traceability, and only fence kinds may carry a trigger, which is the reopening or failure condition; a trigger beside structural, means, boundary, or need is a form finding; a Declined entry naming a guardian scenario is joined to it through the ruling that enforces the decline and never through the fence id, which no scenario may carry — the entry cites, beside its fence-declined ruling, the triggered, structural, or means ruling the guardian proves, and the guardian carries that ruling's tag or one on its chain; findings for an entry whose kind implies a destination that is absent, a scenario citing a reversed entry, a dangling or mis-kinded citation, a spread naming a missing outline, a guardian carrying no tag of the entry's enforcing rulings — one finding per guardian, keyed by the fence ruling, whose fix names an enforcing ruling and never the fence id, and an entry citing no enforcing ruling at all is that same finding with the fix naming the citation to add; what was not counted is listed with why [I>V]
+  sib:   D35
+  serves: N2
+  touches: D68 D163 D88 D24 D23
+# roads not taken: a guardian exempted from the mis-kinded finding, refused as a fence id on a scenario that proves no behaviour and a hole in kind-implies-destination; the hint corrected alone with the contract left to house practice, refused as the shape that produced the field report
+
+D235 2026-11-07 [I>V]
+  pre:   the lint is given the docket and a corpus [I>V]
+  trig:  a fence entry names a guardian whose title matches no scenario in the corpus [I>V]
+  resp:  a traceability finding keyed by the entry's fence ruling, naming the title, whose fix names the scenario to write and the enforcing ruling it carries; a guard checks nothing until its scenario exists, so a misspelt or renamed title was the one way to disable a guard with no finding; the join is by exact title, as a spread's is; with no corpus given the guard stays dark [I>V]
+  sib:   none -- the finding is itself the failure case this entry defines
+  serves: N2
+  touches: D234 D151 D68 D22
+# roads not taken: a counted line, refused as silence by another name on exactly the entries ruled important enough to carry guardians; a near-miss match on the title, refused as inference where every other join is by exact key
+
+D236 2026-11-07 [I>V]
+  pre:   the lint is given the docket and a corpus holding the fence [I>V]
+  trig:  a fence entry makes a guard claim — the words guarded by in any case and with any whitespace between, with a colon after them, or followed by a title in straight, double-curly, backtick, single, or single-curly quotes, a quote character alone opening nothing — in a spelling the one form does not read, or names a guardian title the corpus holds more than once [I>V]
+  resp:  the guard has one form, Guarded by: in that case with its colon, followed by non-empty straight-quoted titles with one comma or none between, before the parenthetical; a claim whose run of titles — in straight, double-curly, backtick, single, or single-curly quotes, a single or single-curly closing quote followed by a letter or digit being an apostrophe in prose and the quoted words no title, so a title holding an apostrophe is written in straight double quotes, after any run of commas, semicolons, or ands — is longer than what the one form reads at that position, or empty, is a traceability finding at the entry naming the form, whether or not the corpus holds a feature file yet; a claim consumes its run, so the words inside a title it names are no second claim; prose that merely says guarded by and quotes nothing right after is no claim and no finding; a title the corpus holds more than once is satisfied by any scenario of that title carrying the enforcing tag, and file order never decides [I>V]
+  sib:   none -- the finding is itself the failure case this entry defines
+  serves: N2
+  touches: D235 D234 D93 D20
+# roads not taken: reading every spelling gherkin-trace reads as the form, refused as the open vocabulary D93 declined — the wider read exists here only as the detector of a claim the form missed, reads what gherkin-trace reads and the quote styles it does not, and a Declined entry in the one form on a bold-topic bullet, where gherkin-trace looks, with one phrase and single-spaced titles, reads alike in both; the last-read scenario deciding a duplicated title, refused as file order deciding a verdict; a duplicated title as its own finding, refused as a finding on the corpus where the fence is the subject

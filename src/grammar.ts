@@ -49,7 +49,7 @@ export const RULE_WORDS = {
   traceability: [
     'uncited-trigger', 'scenario-cites-missing', 'scenario-cites-reversed', 'scenario-mis-kinded', 'scenario-cites-need',
     'untagged-scenario', 'need-not-in-ledger', 'not-in-fence', 'not-in-design', 'spread-no-outline', 'spread-untagged',
-    'guard-untagged', 'ledger-uncited', 'ledger-mis-cite', 'ledger-cites-missing', 'fence-cites-missing',
+    'guard-untagged', 'guard-no-scenario', 'guard-near-miss', 'ledger-uncited', 'ledger-mis-cite', 'ledger-cites-missing', 'fence-cites-missing',
     'fence-cites-reversed', 'fence-mis-kinded', 'design-cites-missing', 'design-cites-reversed',
   ],
 } as const satisfies Record<Layer, readonly string[]>;

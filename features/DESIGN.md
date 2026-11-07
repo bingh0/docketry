@@ -73,7 +73,13 @@ discussion; every change appends a changelog line naming its ruling.
   this document's `ruled` tags. A resolved entry is never counted as
   triggered; only fence kinds may carry a trigger, and there it is the
   reopening or failure condition. The renderer writes those citations;
-  traceability checks them. [ruled: D23, D24, D68]
+  traceability checks them. A Declined entry's guardian joins through the
+  ruling that enforces the decline, cited beside the fence ruling, never
+  through the fence id, which no scenario may carry; a guardian title
+  the corpus lacks is a finding, never silence; the guard phrase has
+  one form, and a guard claim in the listed other spellings is a
+  finding too, while prose that merely says guarded by is no claim.
+  [ruled: D23, D24, D68, D234, D235, D236]
 - The resolution set is seven kinds: boundary, structural, means, need,
   fence-declined, fence-deferred, fence-assumption. Need, means, and the
   fence kinds carry a reference; boundary and structural carry none, and

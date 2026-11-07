@@ -4,7 +4,8 @@ import path from 'node:path';
 import { normalise } from './parse.js';
 
 export interface CorpusScenario { file: string; title: string; tags: string[]; line: number; outline: boolean }
-export interface FenceEntry { section: string; text: string; cites: string[]; guardedBy: string[]; line: number }
+/** guardNearMiss (D236): the guard phrase appears in a spelling the one form does not read, so some quoted title was dropped */
+export interface FenceEntry { section: string; text: string; cites: string[]; guardedBy: string[]; guardNearMiss: boolean; line: number }
 export interface LedgerRow { id: string; text: string; cites: string[]; line: number }
 export interface Deliverables {
   scenarios: CorpusScenario[] | null;
@@ -49,6 +50,44 @@ export function readCorpus(dir: string, gnt: GntApi): CorpusScenario[] {
   return out;
 }
 
+/** the guard's one form: non-empty straight-quoted titles, one comma or none between, as gherkin-trace reads them too */
+const FORM_RUN = '(?:"[^"]+",?\\s*)+';
+/** the one form read at one position: the phrase in this case with its colon, then the run */
+const ONE_FORM = new RegExp(`^Guarded by:\\s*(${FORM_RUN})`, 'u');
+/** the one form wherever it stands in the entry: what the lint takes as the guardians */
+const FORM_ANYWHERE = new RegExp(`Guarded by:\\s*(${FORM_RUN})`, 'gu');
+/**
+ * One more title as a drafter might write it, after any run of commas, semicolons, or ands: straight, double-curly,
+ * backtick, single, or single-curly quotes. A single or single-curly closing quote followed by a letter or digit is an
+ * apostrophe in prose ('til, owner's), never the end of a title.
+ */
+const ANY_TITLE = /^\s*(?:(?:,|;|and\b)\s*)*(?:"[^"]*"|\u201C[^\u201D]*\u201D|`[^`]*`|'[^']*'(?![\p{L}\p{N}])|\u2018[^\u2019]*\u2019(?![\p{L}\p{N}]))/u;
+
+/**
+ * D236: a guard claim is the phrase with its colon, or the phrase followed by a quoted title; prose that merely says
+ * "guarded by" is not one, and neither is the bare phrase followed by an apostrophe word ('til), since a title and
+ * not a quote character opens a claim. For each claim, the run of quoted titles right after it (loose) against the
+ * titles the one form reads at that position (strict); a claim quoting none, or more than the one form reads, is a
+ * near-miss. A claim consumes its run, so the phrase inside a title it named is no second claim.
+ */
+export function guardClaims(text: string): { loose: number; strict: number }[] {
+  const out: { loose: number; strict: number }[] = [];
+  const phrase = /guarded\s+by(\s*:)?/giu;
+  for (let m = phrase.exec(text); m !== null; m = phrase.exec(text)) {
+    const start = m.index + m[0].length;
+    const rest = text.slice(start);
+    if (m[1] === undefined && !ANY_TITLE.test(rest)) continue;
+    let loose = 0;
+    let used = 0;
+    for (let cursor = rest; ; ) { const t = ANY_TITLE.exec(cursor); if (!t) break; loose += 1; used += t[0].length; cursor = cursor.slice(t[0].length); }
+    const run = ONE_FORM.exec(text.slice(m.index));
+    const strict = run ? [...(run[1] ?? '').matchAll(/"([^"]*)"/gu)].length : 0;
+    out.push({ loose, strict });
+    phrase.lastIndex = start + used;
+  }
+  return out;
+}
+
 export function readFence(text: string): FenceEntry[] {
   const out: FenceEntry[] = [];
   let section = '';
@@ -57,12 +96,13 @@ export function readFence(text: string): FenceEntry[] {
     if (!cur) return;
     const tail = /\(([^()]*)\)\s*$/u.exec(cur.text);
     cur.cites = tail ? idsIn(tail[1] ?? '') : [];
-    cur.guardedBy = [...cur.text.matchAll(/Guarded by:\s*((?:"[^"]*"[,\s]*)+)/gu)].flatMap((m) => [...(m[1] ?? '').matchAll(/"([^"]*)"/gu)].map((q) => q[1] ?? ''));
+    cur.guardedBy = [...cur.text.matchAll(FORM_ANYWHERE)].flatMap((m) => [...(m[1] ?? '').matchAll(/"([^"]*)"/gu)].map((q) => q[1] ?? ''));
+    cur.guardNearMiss = guardClaims(cur.text).some((c) => c.loose === 0 || c.loose > c.strict);
     out.push(cur); cur = null;
   };
   for (const [i, ln] of text.split('\n').entries()) {
     if (ln.startsWith('## ')) { flush(); section = ln.slice(3).trim(); continue; }
-    if (ln.startsWith('- ')) { flush(); cur = { section, text: ln.slice(2), cites: [], guardedBy: [], line: i + 1 }; continue; }
+    if (ln.startsWith('- ')) { flush(); cur = { section, text: ln.slice(2), cites: [], guardedBy: [], guardNearMiss: false, line: i + 1 }; continue; }
     if (cur && /^\s+\S/u.test(ln)) { cur.text += ` ${ln.trim()}`; continue; }
     if (ln.trim() === '') flush();
   }

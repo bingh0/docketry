@@ -89,6 +89,26 @@ Rank, lowest first: `?`, `I`, `I>V`, `I+V`, `V` (D120).
 | `fence-deferred` | optional label | the fence, Deferred |
 | `fence-assumption` | optional label | the fence, Named assumptions |
 
+A Declined entry of the fence may name the scenarios that enforce it,
+`Guarded by: "<title>"` before its parenthetical. The guard joins through
+the ruling that enforces the decline, never the fence id, which no
+scenario may carry: the parenthetical cites, beside the fence-declined
+ruling, the triggered, structural, or means ruling the guardian proves,
+and the guardian carries that ruling's tag. An entry citing only its
+fence ruling is a traceability finding whose fix names the citation to
+add. A guardian title the corpus lacks is a traceability finding too,
+by exact title as a spread's outline is; with no corpus the guard is
+dark. The guard has one form, `Guarded by:` with straight-quoted titles
+with one comma or none between, none empty. A guard claim, the phrase
+with its colon or the phrase followed by a quoted title, whose run of
+titles in straight, double-curly, backtick, single, or single-curly
+quotes after commas, semicolons, or ands outruns what the one form
+reads there, or that quotes none, is a finding; prose that merely says
+guarded by is not a claim, and a single quote followed by a letter or
+digit is an apostrophe, so a title holding one is written in straight
+double quotes. A title the corpus holds twice is satisfied by either
+scenario. (D88, D163, D234, D235, D236)
+
 ### Relations
 
 | relation | effect |
@@ -108,6 +128,6 @@ Rank, lowest first: `?`, `I`, `I>V`, `I+V`, `V` (D120).
 | `resolution` | `unresolved` |
 | `coverage` | `no-sib` `unspread` `unserved-need` `unserved-ruling` `orphan-unwanted` |
 | `consistency` | `header-above-slots` `no-touches` `missing-need` `rewrite` `ratifier-not-visionary` `signer-not-visionary` |
-| `traceability` | `uncited-trigger` `scenario-cites-missing` `scenario-cites-reversed` `scenario-mis-kinded` `scenario-cites-need` `untagged-scenario` `need-not-in-ledger` `not-in-fence` `not-in-design` `spread-no-outline` `spread-untagged` `guard-untagged` `ledger-uncited` `ledger-mis-cite` `ledger-cites-missing` `fence-cites-missing` `fence-cites-reversed` `fence-mis-kinded` `design-cites-missing` `design-cites-reversed` |
+| `traceability` | `uncited-trigger` `scenario-cites-missing` `scenario-cites-reversed` `scenario-mis-kinded` `scenario-cites-need` `untagged-scenario` `need-not-in-ledger` `not-in-fence` `not-in-design` `spread-no-outline` `spread-untagged` `guard-untagged` `guard-no-scenario` `guard-near-miss` `ledger-uncited` `ledger-mis-cite` `ledger-cites-missing` `fence-cites-missing` `fence-cites-reversed` `fence-mis-kinded` `design-cites-missing` `design-cites-reversed` |
 
 A rule word never changes within findings-format major 1 (D183).

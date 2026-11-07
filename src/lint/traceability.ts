@@ -1,7 +1,7 @@
 import { FENCE_KINDS, FENCE_SECTION } from '../grammar.js';
 import { chainOf, effectiveShape, roots } from '../effect.js';
 import { entryMap, isNeedId } from '../parse.js';
-import type { Deliverables } from '../deliverables.js';
+import type { CorpusScenario, Deliverables } from '../deliverables.js';
 import type { DocketTree, Entry, Finding } from '../tree.js';
 
 export interface NotCounted { id: string; reason: string }
@@ -12,7 +12,7 @@ const on = (rule: string, entry: string, line: number, message: string, fix: str
   ({ layer: 'traceability', rule, key: entry, entry, slot: null, line, message, fix, ...(where === undefined ? {} : { where }) });
 
 /**
- * The traceability layer (D23, D24, D68, D77, D88, D111, D136, D149/D163, D151, D167):
+ * The traceability layer (D23, D24, D68, D77, D88, D111, D136, D149/D163, D151, D167, D234, D235, D236):
  * kind implies destination; every join is by id, in both directions.
  */
 /** The not-counted kinds the docket alone settles (D197): boundary, relation, reversed, and need-kind rulings no ledger joined. */
@@ -37,7 +37,9 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
   const chain = (id: string): Set<string> => chainOf(tree, id);
   const scenarioTags = new Set((d.scenarios ?? []).flatMap((s) => s.tags));
   const outlines = new Map((d.scenarios ?? []).filter((s) => s.outline).map((s) => [s.title, s]));
-  const titles = new Map((d.scenarios ?? []).map((s) => [s.title, s]));
+  // D236: a title the corpus holds more than once joins every scenario of that title; file order never decides
+  const titles = new Map<string, CorpusScenario[]>();
+  for (const s of d.scenarios ?? []) titles.set(s.title, [...(titles.get(s.title) ?? []), s]);
   const fenceIdsByKind = new Map<string, Set<string>>();
   for (const fe of d.fence ?? []) {
     const kind = Object.entries(FENCE_SECTION).find(([, sec]) => fe.section.startsWith(sec))?.[0];
@@ -47,6 +49,10 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
   const ruled = new Set(d.design?.cites ?? []);
   const rows = new Map((d.ledger ?? []).map((r) => [r.id, r]));
   const shapeOf = (e: Entry): Entry => effectiveShape(tree, byId.get(e.chainRoot) ?? e);
+  /** D163: a scenario may carry a triggered, structural, or means ruling; a need, a boundary, or a fence kind is mis-kinded */
+  const sceneCitable = (e: Entry): boolean => { const k = shapeOf(e).resolution?.kind ?? null; return k === null || k === 'structural' || k === 'means'; };
+  /** D234: a ruling that can enforce a decline is one scenarios prove — triggered, structural, or means by effective shape; a bare relation entry is none of these */
+  const enforces = (e: Entry): boolean => { const x = shapeOf(e); const k = x.resolution?.kind ?? null; return k === 'structural' || k === 'means' || (k === null && x.slots.trig !== undefined); };
 
   for (const r of roots(tree)) {
     if (r.kind === 'need') {
@@ -90,10 +96,11 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
       if (!e) { out.push(at('scenario-cites-missing', where, s.line, `scenario "${s.title}" cites ${t}, an id not in the docket`, 'cite an entry the docket holds')); continue; }
       if (e.kind === 'need') { out.push(at('scenario-cites-need', where, s.line, `scenario "${s.title}" cites ${t}, a need; scenarios cite rulings`, 'cite the ruling that serves the need')); continue; }
       if (!e.inEffect) { out.push(on('scenario-cites-reversed', t, s.line, `scenario "${s.title}" cites ${t}, reversed by ${e.reversedBy.join(', ')}`, 'cite a ruling in effect, or retire the scenario', where)); continue; }
+      if (sceneCitable(e)) continue;
       const x = shapeOf(e);
       const k = x.resolution?.kind ?? null;
-      if (k === 'need') out.push(at('scenario-mis-kinded', where, s.line, `scenario "${s.title}" cites ${t}, which resolves to need ${x.resolution?.reference ?? ''}`, 'cite a triggered, structural, or means ruling'));
-      else if (k === 'boundary' || (k !== null && FENCE_KINDS.includes(k))) out.push(at('scenario-mis-kinded', where, s.line, `scenario "${s.title}" cites ${t}, a ${k} entry`, 'cite a triggered, structural, or means ruling'));
+      const why = k === 'need' ? `which resolves to need ${x.resolution?.reference ?? ''}` : `a ${k ?? ''} entry`;
+      out.push(at('scenario-mis-kinded', where, s.line, `scenario "${s.title}" cites ${t}, ${why}`, 'cite a triggered, structural, or means ruling'));
     }
   }
   for (const fe of d.fence ?? []) {
@@ -112,11 +119,25 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
       const ok = resolvable.some((c) => { const e = byId.get(c); return e !== undefined && shapeOf(e).resolution?.kind === kindStrict; });
       if (resolvable.length > 0 && !ok) out.push(at('fence-mis-kinded', where, fe.line, `${sec} entry cites ${fe.cites.join(', ')} and none is a ${kindStrict} ruling — not a fence kind of this section`, `cite the ${kindStrict} ruling this entry records`));
     }
+    // D234: a guardian joins through the ruling that enforces the decline, never the fence id, which no scenario may carry (D163);
+    // one finding per guardian, keyed by the entry's fence ruling, whose fix names an enforcing ruling to tag or the citation to add
+    const live = fe.cites.flatMap((c) => { const e = byId.get(c); return e?.inEffect ? [e] : []; });
+    const enforcing = live.filter((e) => enforces(e)).map((e) => e.id);
+    const own = live.find((e) => shapeOf(e).resolution?.kind === kindStrict)?.id ?? fe.cites.find((c) => byId.has(c));
+    // D236: the guard has one form; a phrase in any other spelling dropped a title, and silence there is the hole D235 closed
+    if (fe.guardNearMiss) out.push(at('guard-near-miss', where, fe.line, `${sec} entry names guardians in a spelling the guard's one form does not read`, 'Guarded by: "<title>", "<title>" — straight quotes, commas between titles, before the parenthetical'));
     for (const title of fe.guardedBy) {
-      const s = titles.get(title);
-      if (!d.scenarios || !s) continue;
-      const ok = fe.cites.some((c) => byId.has(c) && s.tags.some((t) => chain(c).has(t)));
-      if (!ok) for (const c of fe.cites.filter((id) => byId.has(id))) out.push(on('guard-untagged', c, fe.line, `fence entry is guarded by "${title}", which carries no tag @${c}`, `@${c} on "${title}"`));
+      if (!d.scenarios || own === undefined) continue;
+      const same = titles.get(title);
+      // D235: a guard checks nothing until its scenario exists, so a title the corpus lacks is a finding, never silence
+      if (!same) {
+        const fix = enforcing.length > 0 ? `a scenario titled "${title}" tagged @${enforcing[0] ?? ''}` : `a scenario titled "${title}", and the ruling it proves cited beside ${own}`;
+        out.push(on('guard-no-scenario', own, fe.line, `fence entry is guarded by "${title}" and the corpus has no scenario of that title`, fix));
+        continue;
+      }
+      if (enforcing.some((c) => same.some((s) => s.tags.some((t) => chain(c).has(t))))) continue;
+      if (enforcing.length === 0) out.push(on('guard-untagged', own, fe.line, `fence entry is guarded by "${title}" and cites no triggered, structural, or means ruling`, `cite beside ${own} the triggered, structural, or means ruling "${title}" proves, and tag "${title}" with it`));
+      else out.push(on('guard-untagged', own, fe.line, `fence entry is guarded by "${title}", which carries no tag of ${enforcing.join(', ')}`, `@${enforcing[0] ?? ''} on "${title}"`));
     }
   }
   for (const dl of d.design?.lines ?? []) {
