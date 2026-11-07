@@ -73,7 +73,7 @@ the visionary's ratification.
   on every change, every cycle, every question, and not only at
   handoff.* Context: an instrument that is expensive to run or
   to rule on is not run; observability that nobody reads is none.
-  Evidence: D12, D51, D47, D22, D218, D234, D235, D236. Coverage: `scenario` —
+  Evidence: D12, D51, D47, D22, D218, D234, D235, D236, D237, D239. Coverage: `scenario` —
   the-report-and-its-exits.feature, the-docket-grammar.feature,
   where-each-ruling-landed.feature. Statement as amended by N9.
 - **N3** (visionary, wt 3) — *I need every gap the record shows
@@ -81,7 +81,7 @@ the visionary's ratification.
   grow from what the interview never asked.* Context: the needs that
   shaped one field project most were the ones the interview never asked
   about; a count tells the visionary something is missing, a question
-  tells them what to answer. Evidence: D5, D108, D42, D17. Coverage:
+  tells them what to answer. Evidence: D5, D108, D42, D17, D238, D240. Coverage:
   `scenario` — what-was-never-asked.feature,
   rendering-and-formatting.feature. Statement as amended by N10.
 - **N11** (reviewer, wt 3) — *I need to understand what the record is,

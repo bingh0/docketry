@@ -5,7 +5,15 @@ Each release is named by the rulings it built; the ids are entries in
 Before 1.0 a grammar or findings-format major may bump between package
 minors; the bump ships its migration (D39, D59).
 
-## Unreleased
+## 0.2.0 — beta (2026-11)
+
+Grammar 1, findings format 1, both unchanged; two rule words join the
+traceability layer additively (D39). A corpus clean under 0.1.0 can fail
+0.2.0 strict in three ways: a declined entry's guardian that the corpus
+lacks, a guard phrase in a spelling the one form does not read, and a
+scenario tagged with a bare ratifies, reaffirms, or reverses entry were
+each silent and are now findings. The house fence itself had two such
+guardians.
 
 - **The guard contract** (D234, amends D68): a Declined entry's guardian
   joins through the ruling that enforces the decline, cited beside the
@@ -48,6 +56,33 @@ minors; the bump ships its migration (D39, D59).
   which gherkin-trace does not read; two `Guarded by:` phrases in one
   entry are two guardians in docketry and one in gherkin-trace, and a
   guard outside Declined is read here and not there.
+- **`--help` and `--version` exit zero** (D237), with `-h` and `-v` as
+  their short forms: a question the tool answered is a run that ran;
+  both print to stdout, as the first argument; after a command the same
+  words are that command's arguments. No command, an unknown command,
+  or a command with no docket path still prints the usage to stderr and
+  exits two, and a docket path that is not there is still refused by
+  name.
+- **A spread's outline held twice** (D238, amends D151): any outline of
+  that title carrying the tag satisfies the spread, where before the
+  last file read decided — the same correction D236 made for guardians.
+- **A relation entry with no trigger or resolution of its own is a
+  mis-kinded scenario tag** (D240, amends D163): the check had read
+  "triggered, structural, or means" as "no resolution", so a bare
+  ratifies, reaffirms, reverses, or signs entry, or an amender of one,
+  could carry a scenario. A root whose amender dropped the resolution
+  line is not this case: it is the resolution layer's `unresolved`
+  finding already, and its tag is not reported twice; such a root also
+  enforces no decline, so a guardian carrying only its tag is
+  `guard-untagged`. No house or specimen scenario is affected; one field
+  corpus had two scenarios tagged with a bare ratifies entry, and they
+  are findings there now.
+- **Deferred** (D239): guard spellings outside D236's enumeration, with
+  the reopening condition in the fence and the list in the field report.
+- **CI**: the lanes match gherkin-node-test's — Node 22.17 exact, 24
+  and 26 — and the tarball smoke lints the house docket with its corpus,
+  so the traceability layer runs in the installed binary. Dev
+  dependencies: oxlint 1.92.0, vitest 5.1.0.
 
 ## 0.1.0 — beta (2026-10)
 

@@ -214,11 +214,15 @@ opened a claim; now only a title does), the empty title `""` inside the one form
 outside the form, a near-miss), and six ruled clauses with no scenario that went red; each has one now. Forty-one
 scenarios sit under `@D235` and `@D236`.
 
-## Residuals, recorded and not fixed
+## Residuals, and what became of each
 
 Six reviews were run on this change, each on the increment the previous one produced. Each found smaller edges
-of the same regex reader. The owner stopped after the sixth; what remains is listed here so nobody rediscovers
-it as a surprise. None lies inside the spellings D236 enumerates.
+of the same regex reader. The owner stopped after the sixth and ruled on what remained (2026-11-07): three
+residuals were promoted — the spread outline map is any-of like the guardian map (D238), a bare relation entry
+is a mis-kinded scenario tag under D163 as written, and strict exit codes are now driven through the spawned
+binary (two scenarios under D10) — and the guard spellings outside the enumeration are deferred with their
+reopening condition (D239). The list below is that deferral's record. None lies inside the spellings D236
+enumerates.
 
 - A fullwidth or other Unicode colon, guillemets with no colon, `or`, `&`, `+` between titles, and a zero-width
   space between titles are silent in both tools. Not listed spellings.
@@ -231,9 +235,8 @@ it as a surprise. None lies inside the spellings D236 enumerates.
 - docketry reads a guard under any fence section and on any bullet; gherkin-trace only under Declined on a
   bold-topic bullet. Whitespace inside a title is kept here and collapsed there.
 - The near-miss message names the section by its first word ("Out entry"), as `fence-mis-kinded` already did.
-- Beyond the guard: the spread outline map in the traceability layer is still last-wins across files; strict
-  exit codes are never driven through the spawned CLI in the suite; `scenario-mis-kinded` tolerates a bare
-  relation id as a scenario tag; ccr's table-form fence is not read by docketry at all.
+- ccr's table-form fence is not read by docketry at all; the fence's grammar is the bullet list the scope skill
+  writes, now stated under Out of reach by construction.
 - The need under the whole episode, one fence read alike by two instruments, is on no ledger row.
 `GRAMMAR.md`, `DESIGN.md`, the fence's Roads not taken, and the scope skill's `OUT-OF-SCOPE.md` section state the
 contract. Option 2 was refused: a fence id on a scenario proves no behaviour and holes kind-implies-destination.

@@ -1,6 +1,6 @@
 {
   "name": "@bingh/docketry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A grammar for the interviewer's ruling record — the docket — and a lint that counts its failures. Counts, never verdicts.",
   "license": "MIT",
   "author": "Bing Ho <bingh0@users.noreply.github.com>",

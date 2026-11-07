@@ -289,6 +289,18 @@ export const landedSteps: Table = [
     b.corpusFeature.push({ title, tags: [tag], outline: true });
     assert.notEqual(tag, absent);
   }],
+  [/^a corpus whose outline "([^"]*)" carries the tag @([A-Z]\d+)$/u, (w, title, tag) => {
+    const b = builder(w);
+    b.corpus = true;
+    b.ensure(tag);
+    b.corpusFeature.push({ title, tags: [tag], outline: true });
+  }],
+  [/^a second feature file where the outline "([^"]*)" carries the tag @([A-Z]\d+)$/u, (w, title, tag) => {
+    const b = builder(w);
+    b.corpus = true;
+    b.ensure(tag);
+    scene(w).second.push({ title, tags: [tag], outline: true });
+  }],
   [/^a corpus with no scenario outline titled "(?:[^"]*)"$/u, (w) => { builder(w).corpus = true; }],
   [/^a corpus directory$/u, (w) => { builder(w).corpus = true; }],
   [/^no gnt parser installed where the lint runs$/u, (w) => { builder(w).noGnt = true; }],

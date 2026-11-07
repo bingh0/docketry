@@ -1513,3 +1513,36 @@ D236 2026-11-07 [I>V]
   serves: N2
   touches: D235 D234 D93 D20
 # roads not taken: reading every spelling gherkin-trace reads as the form, refused as the open vocabulary D93 declined — the wider read exists here only as the detector of a claim the form missed, reads what gherkin-trace reads and the quote styles it does not, and a Declined entry in the one form on a bold-topic bullet, where gherkin-trace looks, with one phrase and single-spaced titles, reads alike in both; the last-read scenario deciding a duplicated title, refused as file order deciding a verdict; a duplicated title as its own finding, refused as a finding on the corpus where the fence is the subject
+
+# 2026-11-07 — the release prep for 0.2.0: two items carried since October, and the residuals of the six guard reviews either promoted or deferred with their reopening condition
+
+D237 2026-11-07 [I>V]
+  trig:  the lint is invoked with --help or --version, or their short forms -h and -v, or with no command [I>V]
+  resp:  --help or -h as the first argument prints the usage to stdout and exits zero, and --version or -v as the first argument prints the version alone to stdout and exits zero — a question the tool answered is a run that ran; after a command the same words are that command's arguments, so lint --help is a docket path that is not there; no command, an unknown command, or a command with no docket path prints the usage to stderr and exits two, could not run, as before, and a docket path that is not there is refused by name as before [I>V]
+  sib:   none -- the exit-two case is itself the failure case this entry names
+  serves: N2
+  touches: D26 D22 D10 D33
+# roads not taken: --help as could-not-run, refused as a wrong answer to a right question; the usage on stdout in the error case too, refused as a parse hazard for a caller reading the machine form
+
+D238 2026-11-07 [I>V] amends D151
+  resp:  traceability confirms a spread only when the outline it names carries the spreading entry's tag or the tag of an entry in its chain; an outline title the corpus holds more than once is satisfied by any such outline carrying the tag, and file order never decides; a spread naming an outline tagged with another id is a traceability finding; with no corpus the spread stays counted unverified [I>V]
+  ->     structural
+  serves: N3
+  touches: D151 D236 D121
+# roads not taken: the last-read outline deciding, refused as file order deciding a verdict, as D236 refused it for guardians
+
+D239 2026-11-07 [I>V]
+  pre:   the guard claim reader enumerates its spellings [I>V]
+  trig:  a scoped corpus's fence carries a guard in a spelling outside the enumeration — a fullwidth or other Unicode colon, guillemets with no colon, or, &, or + between titles, an invisible character between titles, a claim inside the parenthetical, a guard under a section other than Declined, a title with doubled spaces — and nothing reports it [I>V]
+  resp:  reading or reporting those spellings is deferred until one appears in a scoped corpus; six reviews over a hundred and thirty built worlds found them only by construction; the record of each is the residuals list in `docs/guard-untagged-vs-mis-kinded-2026-11-07.md` [I>V]
+  ->     fence-deferred guard-spellings
+  serves: N2
+  touches: D236 D235 D93
+# roads not taken: reading them all now, refused as the open vocabulary D93 declined and a ruling per edge with no field specimen behind it
+
+D240 2026-11-07 [I>V] amends D163
+  resp:  a scenario may cite a triggered, structural, or means ruling by effective shape, since a parser's rules are proved by scenarios and a scenario carries the id it came from; a scenario citing a need, a boundary, a fence-kind entry, or an entry whose chain root is a ratifies, reaffirms, reverses, or signs entry with no trigger or resolution of its own is a mis-kinded citation and a traceability finding; a scenario citing an entry whose effective shape has neither trigger nor resolution because an amender dropped the line is the resolution layer's unresolved finding on that root and not a mis-kinded citation, so one defect is reported once and the fix points at the amender; a citation of an amender joins the chain, and the relation test is made on the chain's root so the root's tag and the amender's tag read alike; the set a scenario may carry is also the set that can enforce a decline, and an unresolved root enforces nothing [I>V]
+  ->     structural
+  serves: N3
+  touches: D163 D234 D149 D23
+# roads not taken: every unresolved root mis-kinded at the tag too, refused as one defect reported twice with the fix pointing at the tag when the fault is the amender's missing line; the relation test on the cited entry, refused as the root's tag and the amender's tag reading differently

@@ -28,7 +28,8 @@ braced pipe list `{a | b}`, and a backticked literal; every other
 whitespace token containing a digit is a near-miss unless it is
 id-shaped. A braced island carrying `TBD` (a value nobody has) or `TBR`
 (a value held with low confidence) is an unresolved quantity: counted,
-never a finding, and never cleared by an outline while the token stands.
+never a finding in itself, though like any quantity it still owes a
+spread line, and never cleared by an outline while the token stands.
 (D20, D121, D173, D181, D220, D221, D225)
 
 **Other lines** — `-> KIND (REFERENCE|LABEL)`; `sib: ID` or `sib: none --

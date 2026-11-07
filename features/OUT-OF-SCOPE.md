@@ -94,6 +94,13 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   2026-10-17 are the first field data. Until then a citing surface is
   re-read by hand after each amendment, as the touches line directs.
   (D233, 2026-10-05)
+- **guard-spellings.** Guard phrases outside the enumeration D236 reads:
+  a fullwidth or other Unicode colon, guillemets with no colon, `or`,
+  `&`, or `+` between titles, an invisible character between titles, a
+  claim inside the parenthetical, a guard under a section other than
+  Declined, a title with doubled spaces. Reopens when a scoped corpus's
+  fence carries one and nothing reports it; the list is in
+  `docs/guard-untagged-vs-mis-kinded-2026-11-07.md`. (D239, 2026-11-07)
 - **ratifying-the-never-inferred.** A `ratifies` entry whose target was
   never tagged inferred is a consistency case not yet ruled; held at
   handoff. (D56 ratified by D62, 2026-09-05)
@@ -127,6 +134,10 @@ is also a resolution in `DOCKET.md`, cited by docket id.
 - An unbraced list, or a second failure case inside a slot, is content
   and judgment's lane; a braced list is spread like a quantity. (D24,
   D121)
+
+- A fence written as a Markdown table is not read; the fence's grammar is
+  the bullet list the scope skill writes, one entry per `- ` line with
+  its parenthetical last. (D88)
 
 - Editor integration — highlighting, a language server, in-editor
   squiggles — is nobody's lane here; a finding names its line and its
@@ -164,6 +175,15 @@ is also a resolution in `DOCKET.md`, cited by docket id.
   form; the last-read scenario deciding a duplicated title; a duplicated
   title as its own finding — one form, a guard claim in the listed other
   spellings a finding; either scenario satisfies. (D236, 2026-11-07)
+- `--help` as could-not-run; the usage on stdout in the error case — a
+  question answered is a run that ran, exit zero; the error case keeps
+  stderr and two. (D237, 2026-11-07)
+- The last-read outline deciding a duplicated outline title — any
+  outline of that title carrying the tag satisfies the spread. (D238,
+  2026-11-07)
+- Every unresolved root mis-kinded at its tag too; the relation test on
+  the cited entry — one defect reported once, at the amender, and the
+  relation read on the chain's root. (D240, 2026-11-07)
 - Zero entries as clean; empty as a form finding — could-not-run.
   (D26, 2026-09-04)
 - Roll-up past a threshold; a size warning — size is not a behaviour.

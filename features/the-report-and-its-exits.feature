@@ -34,6 +34,66 @@ Feature: the report and its exits
     When the docket is linted in strict mode
     Then the exit code is 0
 
+  @D10
+  Scenario: strict mode exits one through the command the operator runs
+    Given a docket with 2 findings
+    When the tool is run on the docket with "--strict"
+    Then the exit code is 1
+
+  @D10
+  Scenario: default mode exits zero through the command the operator runs
+    Given a docket with 2 findings
+    When the tool is run on the docket with ""
+    Then the exit code is 0
+
+  @D237
+  Scenario: --help prints the usage and exits zero
+    When the tool is run with "--help"
+    Then the exit code is 0
+    And the standard output contains "usage:"
+
+  @D237
+  Scenario: --version prints the version alone and exits zero
+    When the tool is run with "--version"
+    Then the exit code is 0
+    And the standard output is the lint version alone
+
+  @D237
+  Scenario: the short forms answer as the long ones do
+    When the tool is run with "-h"
+    Then the exit code is 0
+    And the standard output contains "usage:"
+
+  @D237
+  Scenario: -v prints the version alone and exits zero
+    When the tool is run with "-v"
+    Then the exit code is 0
+    And the standard output is the lint version alone
+
+  @D237
+  Scenario: an unknown command prints the usage to the error stream and exits two
+    When the tool is run with "frobnicate"
+    Then the exit code is 2
+    And the standard error contains "usage:"
+
+  @D237
+  Scenario: a command with no docket path prints the usage to the error stream and exits two
+    When the tool is run with "lint"
+    Then the exit code is 2
+    And the standard error contains "usage:"
+
+  @D237
+  Scenario: a flag after a command is that command's argument
+    When the tool is run with "lint --help"
+    Then the exit code is 2
+    And the standard error contains "file not found: --help"
+
+  @D237
+  Scenario: no command prints the usage to the error stream and exits two
+    When the tool is run with ""
+    Then the exit code is 2
+    And the standard error contains "usage:"
+
   @D26
   Scenario Outline: nothing to lint exits two naming the cause
     Given a docket that is <state>
@@ -66,9 +126,9 @@ Feature: the report and its exits
   @D38
   Scenario: every report opens with an instrument line
     Given a docket with 5 entries
-    And lint version 0.1.0 parsing grammar version 1
+    And lint version 0.2.0 parsing grammar version 1
     When the docket is linted without a corpus
-    Then the report's first line names lint version 0.1.0, grammar version 1, and that the gnt parser was not used
+    Then the report's first line names lint version 0.2.0, grammar version 1, and that the gnt parser was not used
 
   @D38
   Scenario: the instrument line names the gnt parser when traceability ran

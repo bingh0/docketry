@@ -138,6 +138,82 @@ Feature: where each ruling landed
     Then the traceability layer has 1 finding keyed R13
     And the finding's message contains "carries no tag @R13"
 
+  @D238
+  Scenario: an outline title the corpus holds twice is satisfied by the later file carrying the tag
+    Given a docket whose entry R13 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R12
+    And a second feature file where the outline "duplicate-timing" carries the tag @R13
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D238
+  Scenario: an outline title the corpus holds twice is satisfied by the earlier file carrying the tag
+    Given a docket whose entry R13 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R13
+    And a second feature file where the outline "duplicate-timing" carries the tag @R12
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D238
+  Scenario: an outline carrying the amender's tag satisfies the spread of the entry it amends
+    Given a docket whose entry R13 has a trigger and whose entry R15 amends R13 keeping the trigger
+    And a docket whose entry R15 has the line "spread: duplicate-timing"
+    And a corpus whose outline "duplicate-timing" carries the tag @R15
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+
+  @D240
+  Scenario: a scenario citing a root whose amender dropped the resolution line is the unresolved finding, not a mis-kinded tag
+    Given a docket whose entry R13 resolves to structural
+    And a docket whose entry R14 amends R13
+    And R14 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R13
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+    And the resolution layer has 1 finding keyed R13
+
+  @D240
+  Scenario: the amender's tag reads as the root's does when the amender dropped the resolution line
+    Given a docket whose entry R13 resolves to structural
+    And a docket whose entry R14 amends R13
+    And R14 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R14
+    When the docket is linted with the corpus
+    Then the traceability layer has 0 findings
+    And the resolution layer has 1 finding keyed R13
+
+  @D240
+  Scenario: a scenario citing a relation entry with no trigger or resolution of its own is a mis-kinded citation
+    Given a docket whose entry R15 reverses R13
+    And R15 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R15
+    When the docket is linted with the corpus
+    Then the traceability layer has 1 finding at the scenario "a duplicate is kept"
+    And the finding's message contains "no trigger or resolution of its own"
+
+  @D240
+  Scenario: a scenario citing the amender of a bare relation entry is a mis-kinded citation too
+    Given a docket whose entry R15 reverses R13
+    And R15 carries no trigger of its own
+    And a docket whose entry R16 amends R15
+    And R16 carries no trigger of its own
+    And a corpus where the scenario "a duplicate is kept" carries the tag @R16
+    When the docket is linted with the corpus
+    Then the traceability layer has 1 finding at the scenario "a duplicate is kept"
+    And the finding's message contains "whose root R15 is a reverses entry"
+
+  @D240
+  Scenario: a root whose amender dropped the resolution line enforces no decline
+    Given a docket whose entry R14 resolves to fence-declined
+    And a docket whose entry R2 resolves to structural
+    And a docket whose entry R3 amends R2
+    And R3 carries no trigger of its own
+    And a fence entry citing R14 and R2 with Guarded by: "a diff handed back as evidence is refused"
+    And a corpus where the scenario "a diff handed back as evidence is refused" carries the tag @R2
+    When the docket is linted with the deliverables
+    Then the traceability layer has 1 finding keyed R14
+    And the finding's message contains "no triggered, structural, or means ruling"
+
   @D24
   Scenario: a spread naming an outline the corpus lacks is a traceability finding
     Given a docket whose entry R13 has the line "spread: duplicate-timing"

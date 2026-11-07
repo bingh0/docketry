@@ -12,7 +12,7 @@ const on = (rule: string, entry: string, line: number, message: string, fix: str
   ({ layer: 'traceability', rule, key: entry, entry, slot: null, line, message, fix, ...(where === undefined ? {} : { where }) });
 
 /**
- * The traceability layer (D23, D24, D68, D77, D88, D111, D136, D149/D163, D151, D167, D234, D235, D236):
+ * The traceability layer (D23, D24, D68, D77, D88, D111, D136, D149/D163/D240, D151/D238, D167, D234, D235, D236):
  * kind implies destination; every join is by id, in both directions.
  */
 /** The not-counted kinds the docket alone settles (D197): boundary, relation, reversed, and need-kind rulings no ledger joined. */
@@ -36,7 +36,9 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
   const ownId = (id: string): boolean => (letter !== null && id.startsWith(letter)) || isNeedId(id);
   const chain = (id: string): Set<string> => chainOf(tree, id);
   const scenarioTags = new Set((d.scenarios ?? []).flatMap((s) => s.tags));
-  const outlines = new Map((d.scenarios ?? []).filter((s) => s.outline).map((s) => [s.title, s]));
+  // D238: an outline title the corpus holds more than once joins every outline of that title; file order never decides
+  const outlines = new Map<string, CorpusScenario[]>();
+  for (const s of d.scenarios ?? []) if (s.outline) outlines.set(s.title, [...(outlines.get(s.title) ?? []), s]);
   // D236: a title the corpus holds more than once joins every scenario of that title; file order never decides
   const titles = new Map<string, CorpusScenario[]>();
   for (const s of d.scenarios ?? []) titles.set(s.title, [...(titles.get(s.title) ?? []), s]);
@@ -49,10 +51,21 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
   const ruled = new Set(d.design?.cites ?? []);
   const rows = new Map((d.ledger ?? []).map((r) => [r.id, r]));
   const shapeOf = (e: Entry): Entry => effectiveShape(tree, byId.get(e.chainRoot) ?? e);
-  /** D163: a scenario may carry a triggered, structural, or means ruling; a need, a boundary, or a fence kind is mis-kinded */
-  const sceneCitable = (e: Entry): boolean => { const k = shapeOf(e).resolution?.kind ?? null; return k === null || k === 'structural' || k === 'means'; };
-  /** D234: a ruling that can enforce a decline is one scenarios prove — triggered, structural, or means by effective shape; a bare relation entry is none of these */
+  /** D234/D240: what can enforce a decline is what scenarios prove — triggered, structural, or means by effective shape */
   const enforces = (e: Entry): boolean => { const x = shapeOf(e); const k = x.resolution?.kind ?? null; return k === 'structural' || k === 'means' || (k === null && x.slots.trig !== undefined); };
+  /**
+   * D163/D240: a scenario may carry what enforces; a need, a boundary, a fence kind, or an entry whose chain root is a
+   * bare relation entry is mis-kinded; a root whose amender dropped the resolution line is the resolution layer's
+   * `unresolved` finding already and is not reported twice. The relation test is made on the chain's root so the root's
+   * tag and the amender's tag read alike.
+   */
+  const sceneCitable = (e: Entry): boolean => {
+    if (enforces(e)) return true;
+    if (shapeOf(e).resolution) return false;
+    // an amends entry is never its own chain root, so a root carrying a relation is a bare ratifies, reaffirms, reverses, or signs
+    const root = byId.get(e.chainRoot) ?? e;
+    return !root.relation;
+  };
 
   for (const r of roots(tree)) {
     if (r.kind === 'need') {
@@ -84,7 +97,7 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
       if (!d.scenarios) continue;
       const o = outlines.get(sp.title);
       if (!o) out.push(on('spread-no-outline', r.id, sp.line, `spread names "${sp.title}" and the corpus has no scenario outline of that title`, `an outline titled "${sp.title}" tagged @${r.id}`));
-      else if (!o.tags.some((t) => ch.has(t))) out.push(on('spread-untagged', r.id, sp.line, `outline "${sp.title}" carries no tag @${r.id}`, `@${r.id} on the outline`));
+      else if (!o.some((s) => s.tags.some((t) => ch.has(t)))) out.push(on('spread-untagged', r.id, sp.line, `outline "${sp.title}" carries no tag @${r.id}`, `@${r.id} on the outline`));
     }
   }
   for (const s of d.scenarios ?? []) {
@@ -99,7 +112,8 @@ export function traceabilityLayer(tree: DocketTree, d: Deliverables, notCounted:
       if (sceneCitable(e)) continue;
       const x = shapeOf(e);
       const k = x.resolution?.kind ?? null;
-      const why = k === 'need' ? `which resolves to need ${x.resolution?.reference ?? ''}` : `a ${k ?? ''} entry`;
+      const root = byId.get(e.chainRoot) ?? e;
+      const why = k === 'need' ? `which resolves to need ${x.resolution?.reference ?? ''}` : k === null ? `${root.id === e.id ? '' : `whose root ${root.id} is `}a ${root.relation?.type ?? 'relation'} entry with no trigger or resolution of its own` : `a ${k} entry`;
       out.push(at('scenario-mis-kinded', where, s.line, `scenario "${s.title}" cites ${t}, ${why}`, 'cite a triggered, structural, or means ruling'));
     }
   }

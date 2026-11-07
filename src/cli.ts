@@ -12,6 +12,7 @@ usage:
   docketry lint   <docket> [--corpus <dir>] [--strict] [--json] [--as-of YYYY-MM-DD]
   docketry format <docket> [--write]             canonical form to stdout, or in place with --write
   docketry render <docket> [--out <dir>]         skeletons to stdout, or into a new directory
+  docketry --help | -h, --version | -v           this text, or the version alone; exit 0
 exit: 0 ran, 1 strict findings, 2 could not run
 run it every chat cycle, not only at handoff: a continuous-integration test of the record (D218)`;
 
@@ -19,6 +20,9 @@ const read = (p: string): string | null => (existsSync(p) ? readFileSync(p, 'utf
 
 export function main(argv: string[]): number {
   const [cmd, file, ...rest] = argv;
+  // D237: a question the tool answered is a run that ran
+  if (cmd === '--help' || cmd === '-h') { process.stdout.write(`${usage}\n`); return 0; }
+  if (cmd === '--version' || cmd === '-v') { process.stdout.write(`${LINT_VERSION}\n`); return 0; }
   const flag = (name: string): string | undefined => { const i = rest.indexOf(name); return i >= 0 ? rest[i + 1] : undefined; };
   const has = (name: string): boolean => rest.includes(name);
   if (!cmd || !file || !['parse', 'lint', 'format', 'render'].includes(cmd)) { process.stderr.write(`${usage}\n`); return 2; }
